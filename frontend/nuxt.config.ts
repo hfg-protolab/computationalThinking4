@@ -5,6 +5,9 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   modules: ['shadcn-nuxt'],
   css: ['~/assets/css/tailwind.css'],
+  runtimeConfig: {
+    public: { apiBase: 'http://localhost:3001' },
+  },
   vite: {
     plugins: [tailwindcss()],
   },

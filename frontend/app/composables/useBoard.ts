@@ -9,38 +9,67 @@ const DEFAULTS: Record<BoardObject['type'], Rect & Partial<TextObject>> = {
   'circle': { x: 0, y: 0, width: GRID_SIZE * 6, height: GRID_SIZE * 6 },
 }
 
+type ObjectChanges = Partial<Rect> & StyleChanges & { text?: string }
+
+// Changes are sent to the backend after a short pause, so dragging or typing
+// does not send one request per pixel or letter.
+const SAVE_DELAY = 300
+const pendingChanges = new Map<string, { changes: ObjectChanges; timer: ReturnType<typeof setTimeout> }>()
+
 // The board state is the single source of truth for which objects exist and what they look like.
-// Components only read it; every change goes through one of the functions below.
+// Components only read it; every change goes through one of the functions below,
+// which update the state right away and then tell the backend.
 export function useBoard() {
-  const objects = useState<BoardObject[]>('objects', () => [
-    { id: 'note-1', type: 'sticky-note', x: 120, y: 120, width: 192, height: 192, text: 'Hello, board!', color: 'yellow', fontSize: FONT_SIZES.M, bold: false },
-    { id: 'note-2', type: 'sticky-note', x: 360, y: 120, width: 192, height: 192, text: 'Drag me around', color: 'pink', fontSize: FONT_SIZES.M, bold: false },
-    { id: 'text-1', type: 'text', x: 600, y: 120, width: 240, height: 72, text: 'Just some text', fontSize: FONT_SIZES.M, bold: false },
-    { id: 'circle-1', type: 'circle', x: 600, y: 240, width: 144, height: 144, color: 'blue' },
-  ])
+  const api = $fetch.create({ baseURL: useRuntimeConfig().public.apiBase })
+  const objects = useState<BoardObject[]>('objects', () => [])
+
+  async function load() {
+    objects.value = await api<BoardObject[]>('/objects')
+  }
+
+  function insert(object: BoardObject) {
+    objects.value = [...objects.value, object]
+    api('/objects', { method: 'POST', body: object })
+  }
 
   function addObject(template: ObjectTemplate, centerX: number, centerY: number) {
     const defaults = DEFAULTS[template.type]
     const id = crypto.randomUUID()
     const x = snapToGrid(centerX - defaults.width / 2)
     const y = snapToGrid(centerY - defaults.height / 2)
-    objects.value = [...objects.value, { ...defaults, ...template, id, x, y } as BoardObject]
+    insert({ ...defaults, ...template, id, x, y } as BoardObject)
     return id
   }
 
   // Works for every variant: the copy keeps all attributes except the id.
   function addCopy(source: BoardObject) {
     const id = crypto.randomUUID()
-    objects.value = [...objects.value, { ...source, id }]
+    insert({ ...source, id })
     return id
   }
 
   function removeObject(id: string) {
+    clearTimeout(pendingChanges.get(id)?.timer)
+    pendingChanges.delete(id)
     objects.value = objects.value.filter(object => object.id !== id)
+    api(`/objects/${id}`, { method: 'DELETE' })
   }
 
-  function updateObject(id: string, changes: Partial<Rect> & StyleChanges & { text?: string }) {
+  function updateObject(id: string, changes: ObjectChanges) {
     objects.value = objects.value.map(object => (object.id === id ? ({ ...object, ...changes } as BoardObject) : object))
+    scheduleSave(id, changes)
+  }
+
+  // Collects the changes per object and sends them together once nothing changed for SAVE_DELAY.
+  function scheduleSave(id: string, changes: ObjectChanges) {
+    const pending = pendingChanges.get(id)
+    clearTimeout(pending?.timer)
+    const merged = { ...pending?.changes, ...changes }
+    const timer = setTimeout(() => {
+      pendingChanges.delete(id)
+      api(`/objects/${id}`, { method: 'PATCH', body: merged })
+    }, SAVE_DELAY)
+    pendingChanges.set(id, { changes: merged, timer })
   }
 
   function moveObject(id: string, x: number, y: number) {
@@ -59,5 +88,5 @@ export function useBoard() {
     updateObject(id, changes)
   }
 
-  return { objects: readonly(objects), addObject, addCopy, removeObject, moveObject, resizeObject, updateText, updateStyle }
+  return { objects: readonly(objects), load, addObject, addCopy, removeObject, moveObject, resizeObject, updateText, updateStyle }
 }

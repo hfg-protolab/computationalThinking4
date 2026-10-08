@@ -10,7 +10,8 @@ const VARIANTS: Record<BoardObject['type'], Component> = {
   'circle': CircleShape,
 }
 
-const { objects, addObject, resizeObject, updateText, updateStyle } = useBoard()
+const { objects, load, addObject, resizeObject, updateText, updateStyle } = useBoard()
+await callOnce(load)
 
 // Local UI state of this user; it is not part of the shared board state.
 const scale = ref(1)
