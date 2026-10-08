@@ -3,8 +3,7 @@ const MIN_SCALE = 0.25
 const MAX_SCALE = 4
 
 const offset = reactive({ x: 0, y: 0 })
-const scale = ref(1)
-provide('canvasScale', scale)
+const scale = defineModel<number>('scale', { default: 1 })
 let dragging = false
 
 function zoomAt(pointX: number, pointY: number, factor: number) {
