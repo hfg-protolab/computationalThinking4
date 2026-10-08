@@ -16,7 +16,8 @@ function onOverflow(size: number) {
     :object="object"
     :selected="selected"
     :editing="editing"
-    class="rounded-full bg-sky-200 shadow-md"
+    :class="CIRCLE_COLORS[object.color]"
+    class="rounded-full shadow-md"
     @grab="(event, mode) => emit('grab', event, mode)"
     @edit="emit('edit')"
   >

@@ -1,3 +1,5 @@
+import type { CircleColor, StickyNoteColor } from '~/utils/palette'
+
 // Base: what every object on the canvas has in common.
 export interface CanvasObject {
   id: string
@@ -12,14 +14,19 @@ export interface CanvasObject {
 export interface StickyNoteObject extends CanvasObject {
   type: 'sticky-note'
   text: string
+  color: StickyNoteColor
 }
 
 export interface CircleObject extends CanvasObject {
   type: 'circle'
   text: string
+  color: CircleColor
 }
 
 export type BoardObject = StickyNoteObject | CircleObject
+
+// What the toolbar picks: the variant and its variant-specific color.
+export type ObjectTemplate = Pick<StickyNoteObject, 'type' | 'color'> | Pick<CircleObject, 'type' | 'color'>
 
 export type Rect = Pick<CanvasObject, 'x' | 'y' | 'width' | 'height'>
 

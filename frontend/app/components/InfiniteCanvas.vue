@@ -2,15 +2,17 @@
 const MIN_SCALE = 0.25
 const MAX_SCALE = 4
 
-const offset = reactive({ x: 0, y: 0 })
+const offset = defineModel<{ x: number; y: number }>('offset', { default: () => ({ x: 0, y: 0 }) })
 const scale = defineModel<number>('scale', { default: 1 })
 let dragging = false
 
 function zoomAt(pointX: number, pointY: number, factor: number) {
   const nextScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale.value * factor))
   const ratio = nextScale / scale.value
-  offset.x = pointX - (pointX - offset.x) * ratio
-  offset.y = pointY - (pointY - offset.y) * ratio
+  offset.value = {
+    x: pointX - (pointX - offset.value.x) * ratio,
+    y: pointY - (pointY - offset.value.y) * ratio,
+  }
   scale.value = nextScale
 }
 
@@ -20,8 +22,7 @@ function onWheel(event: WheelEvent) {
     zoomAt(event.clientX, event.clientY, Math.exp(-event.deltaY * 0.01))
     return
   }
-  offset.x -= event.deltaX
-  offset.y -= event.deltaY
+  offset.value = { x: offset.value.x - event.deltaX, y: offset.value.y - event.deltaY }
 }
 
 function onPointerDown(event: PointerEvent) {
@@ -31,8 +32,7 @@ function onPointerDown(event: PointerEvent) {
 
 function onPointerMove(event: PointerEvent) {
   if (!dragging) return
-  offset.x += event.movementX
-  offset.y += event.movementY
+  offset.value = { x: offset.value.x + event.movementX, y: offset.value.y + event.movementY }
 }
 
 function onPointerUp() {

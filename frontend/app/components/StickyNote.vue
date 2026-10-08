@@ -16,7 +16,8 @@ function onOverflow(height: number) {
     :object="object"
     :selected="selected"
     :editing="editing"
-    class="bg-yellow-200 shadow-md"
+    :class="STICKY_NOTE_COLORS[object.color]"
+    class="shadow-md"
     @grab="(event, mode) => emit('grab', event, mode)"
     @edit="emit('edit')"
   >

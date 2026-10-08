@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
-import type { BoardObject, GestureMode, Rect } from '~/types/canvas-object'
+import type { BoardObject, GestureMode, ObjectTemplate, Rect } from '~/types/canvas-object'
 import { CircleShape, StickyNote } from '#components'
 
 // Which component renders which variant of canvas object.
@@ -9,10 +9,11 @@ const VARIANTS: Record<BoardObject['type'], Component> = {
   'circle': CircleShape,
 }
 
-const { objects, resizeObject, updateText } = useBoard()
+const { objects, addObject, resizeObject, updateText } = useBoard()
 
 // Local UI state of this user; it is not part of the shared board state.
 const scale = ref(1)
+const offset = ref({ x: 0, y: 0 })
 const selectedId = ref<string | null>(null)
 const editingId = ref<string | null>(null)
 
@@ -23,6 +24,15 @@ function onGrab(object: BoardObject, event: PointerEvent, mode: GestureMode) {
   if (editingId.value !== object.id) gesture.start(event, object, mode)
 }
 
+// New objects appear in the middle of the visible area and open straight into editing.
+function onAdd(template: ObjectTemplate) {
+  const centerX = (window.innerWidth / 2 - offset.value.x) / scale.value
+  const centerY = (window.innerHeight / 2 - offset.value.y) / scale.value
+  const id = addObject(template, centerX, centerY)
+  selectedId.value = id
+  editingId.value = id
+}
+
 function onEdit(object: BoardObject) {
   selectedId.value = object.id
   editingId.value = object.id
@@ -30,7 +40,7 @@ function onEdit(object: BoardObject) {
 </script>
 
 <template>
-  <InfiniteCanvas v-model:scale="scale" @pointerdown="selectedId = null">
+  <InfiniteCanvas v-model:scale="scale" v-model:offset="offset" @pointerdown="selectedId = null">
     <component
       :is="VARIANTS[object.type]"
       v-for="object in objects"
@@ -45,4 +55,5 @@ function onEdit(object: BoardObject) {
       @resize="(rect: Rect) => resizeObject(object.id, rect)"
     />
   </InfiniteCanvas>
+  <ObjectToolbar @add="onAdd" />
 </template>

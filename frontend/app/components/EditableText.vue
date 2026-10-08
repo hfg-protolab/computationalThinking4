@@ -31,6 +31,7 @@ watch(
     textarea.value?.focus()
     textarea.value?.select()
   },
+  { immediate: true },
 )
 </script>
 
