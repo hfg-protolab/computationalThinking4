@@ -24,6 +24,8 @@ function onOverflow(size: number) {
     <EditableText
       :text="object.text"
       :editing="editing"
+      :font-size="object.fontSize"
+      :bold="object.bold"
       class="p-[15%] text-center"
       @text="text => emit('text', text)"
       @edit-end="emit('editEnd')"

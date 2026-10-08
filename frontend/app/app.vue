@@ -9,7 +9,7 @@ const VARIANTS: Record<BoardObject['type'], Component> = {
   'circle': CircleShape,
 }
 
-const { objects, addObject, resizeObject, updateText } = useBoard()
+const { objects, addObject, resizeObject, updateText, updateStyle } = useBoard()
 
 // Local UI state of this user; it is not part of the shared board state.
 const scale = ref(1)
@@ -18,6 +18,18 @@ const selectedId = ref<string | null>(null)
 const editingId = ref<string | null>(null)
 
 const gesture = useObjectGesture(scale)
+useShortcuts(selectedId, editingId)
+
+const selectedObject = computed(() => objects.value.find(object => object.id === selectedId.value))
+
+// The context bar lives in screen space, centered above the selected object.
+const contextBarPosition = computed(() => {
+  const object = selectedObject.value
+  if (!object) return {}
+  const left = offset.value.x + (object.x + object.width / 2) * scale.value
+  const top = offset.value.y + object.y * scale.value - 12
+  return { left: `${left}px`, top: `${top}px` }
+})
 
 function onGrab(object: BoardObject, event: PointerEvent, mode: GestureMode) {
   selectedId.value = object.id
@@ -55,5 +67,11 @@ function onEdit(object: BoardObject) {
       @resize="(rect: Rect) => resizeObject(object.id, rect)"
     />
   </InfiniteCanvas>
+  <ObjectContextBar
+    v-if="selectedObject"
+    :object="selectedObject"
+    :style="contextBarPosition"
+    @change="changes => updateStyle(selectedObject!.id, changes)"
+  />
   <ObjectToolbar @add="onAdd" />
 </template>

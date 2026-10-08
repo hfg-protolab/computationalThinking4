@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{ text: string; editing: boolean }>()
+const props = defineProps<{ text: string; editing: boolean; fontSize: number; bold: boolean }>()
 const emit = defineEmits<{ text: [text: string]; editEnd: []; overflow: [height: number] }>()
 
 const root = useTemplateRef<HTMLElement>('root')
@@ -21,7 +21,7 @@ onMounted(() => {
   observer.observe(root.value!)
 })
 onBeforeUnmount(() => observer?.disconnect())
-watch(() => [props.text, props.editing], checkOverflow)
+watch(() => [props.text, props.editing, props.fontSize, props.bold], checkOverflow)
 
 watch(
   () => props.editing,
@@ -36,7 +36,11 @@ watch(
 </script>
 
 <template>
-  <div ref="root" class="size-full overflow-hidden text-lg">
+  <div
+    ref="root"
+    class="size-full overflow-hidden leading-snug"
+    :style="{ fontSize: `${fontSize}px`, fontWeight: bold ? 700 : 400 }"
+  >
     <textarea
       v-if="editing"
       ref="textarea"

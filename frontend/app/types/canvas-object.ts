@@ -10,16 +10,21 @@ export interface CanvasObject {
   height: number
 }
 
-// Variants: extend the base with their own type and attributes.
-export interface StickyNoteObject extends CanvasObject {
-  type: 'sticky-note'
+// Intermediate level: a canvas object that also shows styled text.
+export interface TextObject extends CanvasObject {
   text: string
+  fontSize: number
+  bold: boolean
+}
+
+// Variants: extend TextObject with their own type and their own color palette.
+export interface StickyNoteObject extends TextObject {
+  type: 'sticky-note'
   color: StickyNoteColor
 }
 
-export interface CircleObject extends CanvasObject {
+export interface CircleObject extends TextObject {
   type: 'circle'
-  text: string
   color: CircleColor
 }
 
@@ -27,6 +32,9 @@ export type BoardObject = StickyNoteObject | CircleObject
 
 // What the toolbar picks: the variant and its variant-specific color.
 export type ObjectTemplate = Pick<StickyNoteObject, 'type' | 'color'> | Pick<CircleObject, 'type' | 'color'>
+
+// What the context bar can change on the selected object.
+export type StyleChanges = Partial<Pick<TextObject, 'fontSize' | 'bold'>> & { color?: StickyNoteColor | CircleColor }
 
 export type Rect = Pick<CanvasObject, 'x' | 'y' | 'width' | 'height'>
 

@@ -13,3 +13,5 @@ export const CIRCLE_COLORS = {
 
 export type StickyNoteColor = keyof typeof STICKY_NOTE_COLORS
 export type CircleColor = keyof typeof CIRCLE_COLORS
+
+export const FONT_SIZES = { S: 14, M: 18, L: 24, XL: 32 } as const
