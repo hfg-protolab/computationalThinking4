@@ -11,3 +11,5 @@ The software is built up step by step. Each step introduces a clearly named arch
 - **Monorepo** based on **npm workspaces**
 - **Nuxt** as the framework for the web application (`frontend/`)
 - **Tailwind CSS** with **shadcn-vue** for styling and UI components
+- **Hono** on Node.js as the backend API (`backend/`)
+- **Bruno** for testing the API, usable directly in VS Code (`bruno/`)

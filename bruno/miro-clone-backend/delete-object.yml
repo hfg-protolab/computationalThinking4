@@ -1,0 +1,12 @@
+info:
+  name: Delete object
+  type: http
+  seq: 4
+
+http:
+  method: DELETE
+  url: http://localhost:3001/objects/:id
+  params:
+    - name: id
+      value: note-from-bruno
+      type: path

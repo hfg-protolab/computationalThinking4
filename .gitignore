@@ -8,3 +8,6 @@ dist
 
 # Lecture notes (local only)
 lecture/
+
+# Board data written by the backend
+backend/data/

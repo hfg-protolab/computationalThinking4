@@ -2,11 +2,15 @@
   "name": "computational-thinking-4",
   "private": true,
   "workspaces": [
-    "frontend"
+    "frontend",
+    "backend"
   ],
   "scripts": {
-    "dev": "npm run dev -w frontend",
-    "build": "npm run build -w frontend",
+    "dev": "concurrently -n frontend,backend -c cyan,magenta \"npm run dev -w frontend\" \"npm run dev -w backend\"",
+    "build": "npm run build --workspaces",
     "sync": "node scripts/sync.mjs"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
   }
 }

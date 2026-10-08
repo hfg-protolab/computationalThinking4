@@ -1,0 +1,26 @@
+info:
+  name: Create object
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: http://localhost:3001/objects
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "id": "note-from-bruno",
+        "type": "sticky-note",
+        "x": 120,
+        "y": 120,
+        "width": 192,
+        "height": 192,
+        "text": "Created with Bruno",
+        "fontSize": 18,
+        "bold": false,
+        "color": "yellow"
+      }

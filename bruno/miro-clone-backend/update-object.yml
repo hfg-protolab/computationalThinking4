@@ -1,0 +1,22 @@
+info:
+  name: Update object
+  type: http
+  seq: 3
+
+http:
+  method: PATCH
+  url: http://localhost:3001/objects/:id
+  params:
+    - name: id
+      value: note-from-bruno
+      type: path
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "x": 360,
+        "color": "pink"
+      }
