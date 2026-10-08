@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import type { BoardObject, GestureMode, ObjectTemplate, Rect } from '~/types/canvas-object'
-import { CircleShape, StickyNote } from '#components'
+import { CircleShape, PlainText, StickyNote } from '#components'
 
 // Which component renders which variant of canvas object.
 const VARIANTS: Record<BoardObject['type'], Component> = {
   'sticky-note': StickyNote,
+  'text': PlainText,
   'circle': CircleShape,
 }
 
@@ -36,18 +37,17 @@ function onGrab(object: BoardObject, event: PointerEvent, mode: GestureMode) {
   if (editingId.value !== object.id) gesture.start(event, object, mode)
 }
 
-// New objects appear in the middle of the visible area and open straight into editing.
+// New objects appear in the middle of the visible area and open straight into editing if they have text.
 function onAdd(template: ObjectTemplate) {
   const centerX = (window.innerWidth / 2 - offset.value.x) / scale.value
   const centerY = (window.innerHeight / 2 - offset.value.y) / scale.value
   const id = addObject(template, centerX, centerY)
-  selectedId.value = id
-  editingId.value = id
+  onEdit(objects.value.find(object => object.id === id)!)
 }
 
 function onEdit(object: BoardObject) {
   selectedId.value = object.id
-  editingId.value = object.id
+  if ('text' in object) editingId.value = object.id
 }
 </script>
 
