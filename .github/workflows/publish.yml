@@ -12,8 +12,11 @@ name: Stand veroeffentlichen
 
 on:
   schedule:
-    # Mi + Do, 14:45–16:45 UTC alle 30 min — deckt 15:30 Berlin in Sommer- und Winterzeit ab.
-    - cron: '*/30 14-16 * * 3,4'
+    # Taeglich alle 15 min, 13:00–15:45 UTC = ab 15:00 (Sommerzeit) bzw. 14:00
+    # (Winterzeit) Berlin. Was rausgeht, entscheidet der Endpunkt — ein Lauf an
+    # einem Tag ohne Vorlesung pusht nichts. GitHub startet solche Laeufe oft
+    # verspaetet; die Uebersicht verlinkt deshalb erst, was wirklich gepusht ist.
+    - cron: '*/15 13-15 * * *'
   workflow_dispatch:
     inputs:
       tag:
