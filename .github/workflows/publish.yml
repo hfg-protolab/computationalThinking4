@@ -1,0 +1,66 @@
+# Veroeffentlicht freigegebene Staende ins Kurs-Repo der Studierenden.
+#
+# Welche Tags frei sind, entscheidet die Vorlesungsseite (session.yml +
+# codeRelease) — hier steht kein Datum. Jeder freie Tag, der im Public-Repo
+# noch fehlt, wird gepusht, und dessen main auf den neuesten vorgezogen.
+#
+# Einrichtung: Deploy-Key mit Schreibrecht im Ziel-Repo anlegen, den privaten
+# Schluessel hier als Secret PUBLIC_REPO_DEPLOY_KEY hinterlegen, und das Ziel
+# als Variable PUBLIC_REPO (z.B. git@github.com:hfg-protolab/computationalThinking4.git).
+# Ohne Variable bricht der Lauf ab — nie aus Versehen ins falsche Repo.
+name: Stand veroeffentlichen
+
+on:
+  schedule:
+    # Mi + Do, 14:45–16:45 UTC alle 30 min — deckt 15:30 Berlin in Sommer- und Winterzeit ab.
+    - cron: '*/30 14-16 * * 3,4'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Diesen Tag sofort veroeffentlichen (leer = nach Zeitplan)'
+        required: false
+
+concurrency: publish
+
+env:
+  PUBLIC_REPO: ${{ vars.PUBLIC_REPO }}
+  RELEASES_URL: https://computational-thinking-4.vercel.app/api/code-releases
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.PUBLIC_REPO_DEPLOY_KEY }}
+
+      - name: Freie Tags bestimmen
+        id: tags
+        run: |
+          if [ -n "${{ inputs.tag }}" ]; then
+            tags="${{ inputs.tag }}"
+          else
+            tags=$(curl -fsS "$RELEASES_URL" | jq -r '.tags[]')
+          fi
+          # Der Anfangscode ist immer frei, falls es ihn als eigenen Tag gibt.
+          git rev-parse -q --verify refs/tags/V_00 >/dev/null && tags="V_00 $tags"
+          echo "list=$(echo $tags)" >> "$GITHUB_OUTPUT"
+
+      - name: Fehlende Tags pushen
+        run: |
+          [ -n "$PUBLIC_REPO" ] || { echo "::error::Variable PUBLIC_REPO fehlt"; exit 1; }
+          git remote add public "$PUBLIC_REPO"
+          published=$(git ls-remote --tags public | sed 's#.*refs/tags/##')
+          latest=""
+          for tag in ${{ steps.tags.outputs.list }}; do
+            git rev-parse -q --verify "refs/tags/$tag" >/dev/null || { echo "::warning::$tag fehlt im Dev-Repo"; continue; }
+            latest="$tag"
+            echo "$published" | grep -qx "$tag" && continue
+            git push public "refs/tags/$tag"
+          done
+          # main folgt dem neuesten freien Stand — nur vorwaerts, nie Force.
+          [ -n "$latest" ] && git push public "$latest^{commit}:refs/heads/main"
