@@ -51,6 +51,8 @@ jobs:
           fi
           # Der Anfangscode ist immer frei, falls es ihn als eigenen Tag gibt.
           git rev-parse -q --verify refs/tags/V_00 >/dev/null && tags="V_00 $tags"
+          # Nachbesserungen eines Termins (V_01_1, V_01_2 …) gehen mit ihm raus.
+          tags=$(for tag in $tags; do echo "$tag"; git tag -l "${tag}_*" | sort -V; done)
           echo "list=$(echo $tags)" >> "$GITHUB_OUTPUT"
 
       - name: Fehlende Tags pushen
@@ -66,4 +68,13 @@ jobs:
             git push public "refs/tags/$tag"
           done
           # main folgt dem neuesten freien Stand — nur vorwaerts, nie Force.
-          [ -n "$latest" ] && git push public "$latest^{commit}:refs/heads/main"
+          [ -n "$latest" ] || exit 0
+          # Steht main schon dort oder weiter (z.B. nach einem Lauf von Hand), nichts tun.
+          if git fetch -q public main 2>/dev/null && git merge-base --is-ancestor "$latest^{commit}" FETCH_HEAD; then
+            echo "main enthaelt $latest schon."
+            exit 0
+          fi
+          git push public "$latest^{commit}:refs/heads/main" || {
+            echo "::error::main im Public-Repo liegt nicht auf dem Weg zu $latest — einmalig von Hand setzen (push --force)."
+            exit 1
+          }
