@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import type { BoardObject, GestureMode, ObjectTemplate, Rect } from '~/types/canvas-object'
-import { ArrowLeft as ArrowLeftIcon } from '@lucide/vue'
+import { House as HouseIcon } from '@lucide/vue'
 import { CircleShape, PlainText, StickyNote } from '#components'
 
 // Which component renders which variant of canvas object.
@@ -86,10 +86,10 @@ function onEdit(object: BoardObject) {
     <ObjectToolbar @add="onAdd" />
     <NuxtLink
       to="/"
-      class="fixed left-6 top-6 flex items-center gap-2 rounded-xl border bg-white px-3 py-2 font-medium shadow-lg hover:bg-muted"
+      aria-label="Back to all boards"
+      class="fixed left-6 top-6 flex size-10 items-center justify-center rounded-xl border bg-white shadow-lg hover:bg-muted"
     >
-      <ArrowLeftIcon class="size-4" />
-      {{ board.name }}
+      <HouseIcon class="size-5" />
     </NuxtLink>
   </div>
 </template>

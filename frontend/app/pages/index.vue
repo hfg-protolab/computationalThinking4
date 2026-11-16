@@ -38,17 +38,17 @@ function onRemove(board: Board) {
       Noch keine Boards – leg das erste an.
     </p>
 
-    <ul class="grid grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] gap-4">
+    <ul class="flex flex-col gap-3">
       <li
         v-for="board in boards"
         :key="board.id"
         class="group relative rounded-xl border bg-white shadow-sm transition-shadow hover:shadow-md"
       >
-        <NuxtLink :to="`/boards/${board.id}`" class="block p-5 pr-20">
-          <span class="block truncate font-medium">{{ board.name }}</span>
-          <span class="text-sm text-muted-foreground">{{ new Date(board.createdAt).toLocaleDateString('de-DE') }}</span>
+        <NuxtLink :to="`/boards/${board.id}`" class="flex items-baseline gap-4 py-4 pl-5 pr-24">
+          <span class="truncate font-medium">{{ board.name }}</span>
+          <span class="shrink-0 text-sm text-muted-foreground">{{ new Date(board.createdAt).toLocaleDateString('de-DE') }}</span>
         </NuxtLink>
-        <div class="absolute right-2 top-2 flex opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+        <div class="absolute right-3 top-1/2 flex -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
           <Button variant="ghost" size="icon-sm" aria-label="Rename board" @click="onRename(board)">
             <PencilIcon />
           </Button>
