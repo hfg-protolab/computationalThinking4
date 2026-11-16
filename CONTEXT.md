@@ -12,4 +12,5 @@ The software is built up step by step. Each step introduces a clearly named arch
 - **Nuxt** as the framework for the web application (`frontend/`)
 - **Tailwind CSS** with **shadcn-vue** for styling and UI components
 - **Hono** on Node.js as the backend API (`backend/`)
+- **Supabase** (PostgreSQL) as the database; only the backend talks to it, via the Data API
 - **Bruno** for testing the API, usable directly in VS Code (`bruno/`)
