@@ -1,0 +1,12 @@
+info:
+  name: Delete board
+  type: http
+  seq: 8
+
+http:
+  method: DELETE
+  url: http://localhost:3001/boards/:id
+  params:
+    - name: id
+      value: board-from-bruno
+      type: path

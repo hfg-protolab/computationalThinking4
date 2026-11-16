@@ -1,0 +1,21 @@
+info:
+  name: Rename board
+  type: http
+  seq: 3
+
+http:
+  method: PATCH
+  url: http://localhost:3001/boards/:id
+  params:
+    - name: id
+      value: board-from-bruno
+      type: path
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Renamed with Bruno"
+      }

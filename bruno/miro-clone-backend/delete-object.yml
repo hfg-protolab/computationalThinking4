@@ -1,7 +1,7 @@
 info:
   name: Delete object
   type: http
-  seq: 4
+  seq: 7
 
 http:
   method: DELETE

@@ -1,0 +1,18 @@
+info:
+  name: Create board
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: http://localhost:3001/boards
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "id": "board-from-bruno",
+        "name": "Created with Bruno"
+      }
