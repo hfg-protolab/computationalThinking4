@@ -1,10 +1,11 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 // The backend treats objects as plain JSON; it only relies on every object having an id.
 export type BoardObject = { id: string } & Record<string, unknown>
 
-const FILE = new URL('../data/board.json', import.meta.url).pathname
+const FILE = fileURLToPath(new URL('../data/board.json', import.meta.url))
 
 // All objects live in memory and are written to the JSON file after every change.
 // This module is the only place that knows about the file; a database can replace it later.
