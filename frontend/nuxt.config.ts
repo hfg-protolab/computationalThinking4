@@ -10,6 +10,11 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: { apiBase: 'http://localhost:3001' },
   },
+  // Workaround for Nuxt 4.6 on Windows: without it Nitro leaves Nuxt's own renderer unbundled,
+  // and every page fails with "Either manifest or precomputed data must be provided".
+  nitro: {
+    externals: { inline: [/[\\/]nuxt[\\/]dist[\\/]/] },
+  },
   vite: {
     plugins: [tailwindcss()],
   },
