@@ -5,4 +5,8 @@ info:
 
 http:
   method: GET
-  url: http://localhost:3001/objects
+  url: http://localhost:3001/boards/:boardId/objects
+  params:
+    - name: boardId
+      value: 96e2aa60-9936-43d3-a55a-1551bc3bd367
+      type: path
